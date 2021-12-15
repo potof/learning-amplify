@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "serviceConfiguration": {
+    "apiName": "learningamplify",
+    "serviceName": "AppSync",
+    "gqlSchemaPath": "/Users/hosodakazuya/Dev/github/learning-amplify/amplify/backend/api/learningamplify/schema.graphql",
+    "defaultAuthType": {
+      "mode": "API_KEY",
+      "expirationTime": 7
+    }
+  }
+}
