@@ -15,5 +15,12 @@
         }
       }
     }
+  },
+  "function": {
+    "getReadBookListFromDokusyoMeter": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
   }
 }
