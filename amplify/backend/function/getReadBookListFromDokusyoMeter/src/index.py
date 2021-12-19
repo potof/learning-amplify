@@ -1,20 +1,15 @@
-import json
+import settings
 from gql import gql, Client
 from gql.transport.requests import RequestsHTTPTransport
 
-# AppSyncのエンドポイントのURL
-ENDPOINT="https://s7ni7go37fak3domb2yeimie3i.appsync-api.us-east-2.amazonaws.com/graphql"
-# AppSyncのAPI KEY
-API_KEY="da2-g5xlj3b5ivg65dfwpnkgzgkwge"
-
 _headers = {
     "Content-Type": "application/graphql",
-    "x-api-key": API_KEY,
+    "x-api-key": settings.API_KEY,
 }
 
 _transport = RequestsHTTPTransport(
     headers=_headers,
-    url=ENDPOINT,
+    url=settings.ENDPOINT,
     use_json=True,
 )
 
