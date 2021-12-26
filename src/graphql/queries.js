@@ -7,6 +7,7 @@ export const getBook = /* GraphQL */ `
       id
       title
       readDate
+      author
       page
       createdAt
       updatedAt
@@ -24,6 +25,7 @@ export const listBooks = /* GraphQL */ `
         id
         title
         readDate
+        author
         page
         createdAt
         updatedAt

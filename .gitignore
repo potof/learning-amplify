@@ -44,4 +44,3 @@ amplifytools.xcconfig
 #amplify-do-not-edit-end
 
 amplify/backend/function/getReadBookListFromDokusyoMeter/src/settings.py
-amplify/backend/function/getReadBookListFromDokusyoMeter/src/settings.py

@@ -6,5 +6,6 @@ type Book @model {
   id: ID!
   title: String!
   readDate: String
+  author: String
   page: Int
 }

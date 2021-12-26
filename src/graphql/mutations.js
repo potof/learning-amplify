@@ -10,6 +10,7 @@ export const createBook = /* GraphQL */ `
       id
       title
       readDate
+      author
       page
       createdAt
       updatedAt
@@ -25,6 +26,7 @@ export const updateBook = /* GraphQL */ `
       id
       title
       readDate
+      author
       page
       createdAt
       updatedAt
@@ -40,6 +42,7 @@ export const deleteBook = /* GraphQL */ `
       id
       title
       readDate
+      author
       page
       createdAt
       updatedAt

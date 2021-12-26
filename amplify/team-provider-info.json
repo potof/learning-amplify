@@ -15,7 +15,7 @@
       "function": {
         "getReadBookListFromDokusyoMeter": {
           "deploymentBucketName": "amplify-learningamplify-dev-103324-deployment",
-          "s3Key": "amplify-builds/getReadBookListFromDokusyoMeter-2b6f6e6d387174534f4d-build.zip"
+          "s3Key": "amplify-builds/getReadBookListFromDokusyoMeter-3856536e34676f724266-build.zip"
         }
       }
     }
