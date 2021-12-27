@@ -9,3 +9,15 @@ type Book @model {
   author: String
   page: Int
 }
+
+input BookInput {
+  id: ID
+  title: String!
+  readDate: String
+  author: String
+  page: Int    
+}
+
+type Mutation {
+  batchAddBook(books: [BookInput]): [Book]
+}

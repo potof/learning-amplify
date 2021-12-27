@@ -1,0 +1,20 @@
+
+## 一度に複数レコードを登録する
+## id, createdAt, updateAt を付与して配列形式で送る
+
+#set($data = [])
+#set( $createdAt = $util.time.nowISO8601() )
+#foreach($item in ${ctx.args.books})
+    $util.qr($item.put("id", $util.defaultIfNullOrBlank($item.id, $util.autoId())))
+    $util.qr($item.put("createdAt", $util.defaultIfNull($item.createdAt, $createdAt)))
+    $util.qr($item.put("updatedAt", $util.defaultIfNull($item.updatedAt, $createdAt)))
+    $util.qr($data.add($util.dynamodb.toMapValues($item)))
+#end
+
+{
+    "version" : "2018-05-29",
+    "operation" : "BatchPutItem",
+    "tables" : {
+        "Book-boysbznvffghtjsrvtltffxtom-dev": $util.toJson($data)
+    }
+}
