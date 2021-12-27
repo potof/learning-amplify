@@ -1,6 +1,8 @@
 import settings
 from gql import gql, Client
 from gql.transport.requests import RequestsHTTPTransport
+import dokusyometer
+import json
 
 _headers = {
     "Content-Type": "application/graphql",
@@ -18,26 +20,28 @@ client = Client(
     fetch_schema_from_transport=True,
 )
 
-query = """
-        query getAllBook {
-            listBooks {
-                items {
-                    id
-                    page
-                    readDate
-                    title
-                }
+
+def handler():
+# def handler(event, context):    
+
+    dm = dokusyometer.DokusyoMeter(settings.DOKUSYO_USER, settings.DOKUSYO_PASS)
+    batch_json = dm.scrap_readbooks()
+    # TODO: 本当はエラー分岐が必要
+
+
+    query = """
+        mutation batchAddBook($batch_json: [BookInput]) {
+            batchAddBook(books: $batch_json) {
+                id
+                title
+                author
+                page
+                readDate
             }
         }
-    """
+        """
 
-
-
-# def handler():
-def handler(event, context):
-    print('received event:')
-    
-    rs = client.execute(gql(query))
+    rs = client.execute(gql(query), variable_values=json.dumps({"batch_json": batch_json}))
     print(rs)
 
     return {
@@ -51,5 +55,5 @@ def handler(event, context):
     }
 
 # for debug
-# handler()
+handler()
 

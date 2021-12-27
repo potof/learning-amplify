@@ -43,6 +43,7 @@ class DokusyoMeter:
         # 画面下部のページネーションの最後のリンクを最終ページとして取得する
         lastpage_href = soup.find_all("a", class_="bm-pagination__link")[-1].get("href")
         lastpage = int(re.findall(r".*page=(.*)", lastpage_href)[0])
+        # lastpage = 2
 
         # 本棚ページに移動して読んだ本を取得する
         books_list = []
@@ -71,6 +72,4 @@ class DokusyoMeter:
                 }
                 books_list.append(l)
         return books_list 
-
-
 
