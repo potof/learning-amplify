@@ -3,6 +3,7 @@ from gql import gql, Client
 from gql.transport.requests import RequestsHTTPTransport
 import dokusyometer
 import json
+import time
 
 _headers = {
     "Content-Type": "application/graphql",
@@ -21,8 +22,8 @@ client = Client(
 )
 
 
-def handler():
-# def handler(event, context):    
+# def handler():
+def handler(event, context):    
 
     dm = dokusyometer.DokusyoMeter(settings.DOKUSYO_USER, settings.DOKUSYO_PASS)
     batch_json = dm.scrap_readbooks()
@@ -41,8 +42,13 @@ def handler():
         }
         """
 
-    rs = client.execute(gql(query), variable_values=json.dumps({"batch_json": batch_json}))
-    print(rs)
+    rs = []
+    # 一度にすべて送ると制限に引っかかって登録できないので 25件 に分割して登録していく
+    for i in range(0, len(batch_json), 25):
+        data = batch_json[i:i+25]
+        r = client.execute(gql(query), variable_values=json.dumps({"batch_json": data}))
+        rs.append(r)
+        time.sleep(5)
 
     return {
         'statusCode': 200,
@@ -55,5 +61,5 @@ def handler():
     }
 
 # for debug
-handler()
+# handler()
 

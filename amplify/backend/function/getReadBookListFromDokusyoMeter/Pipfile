@@ -9,7 +9,6 @@ verify_ssl = true
 src = {editable = true, path = "./src"}
 gql = "*"
 beautifulsoup4 = "*"
-lxml = "*"
 
 [requires]
 python_version = "3.8"

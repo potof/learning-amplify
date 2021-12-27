@@ -25,7 +25,7 @@ class DokusyoMeter:
         # authenticity_tokenの取得
         session = requests.session()
         r = session.get(url_login)
-        soup = BeautifulSoup(r.text, "lxml")
+        soup = BeautifulSoup(r.text, "html.parser")
         auth_token = soup.find(attrs={'name': 'authenticity_token'}).get('value')
         login_info['authenticity_token'] = auth_token
 
@@ -38,25 +38,27 @@ class DokusyoMeter:
         booklist_url = url_base + "/users/" + user_id + "/books/read?display_type=list"
         res = session.get(booklist_url)
         res.raise_for_status
-        soup = BeautifulSoup(res.text, "lxml")
+        soup = BeautifulSoup(res.text, "html.parser")
 
         # 画面下部のページネーションの最後のリンクを最終ページとして取得する
         lastpage_href = soup.find_all("a", class_="bm-pagination__link")[-1].get("href")
         lastpage = int(re.findall(r".*page=(.*)", lastpage_href)[0])
         # lastpage = 2
+        time.sleep(5)
 
         # 本棚ページに移動して読んだ本を取得する
         books_list = []
         for current_pagination in range(1, lastpage+1):
-            # サーバ負荷を考慮して 5 sec 待機
-            time.sleep(5)
 
             url = booklist_url + "&page=" + str(current_pagination)
             res = session.get(url)
             res.raise_for_status
-            soup = BeautifulSoup(res.text, "lxml")
+            soup = BeautifulSoup(res.text, "html.parser")
 
-            # 読んだ本の取得
+            # サーバ負荷を考慮して 10 sec 待機
+            time.sleep(10)
+
+            # 読んだ本をパースする
             books_s = soup.select("li.group__book")
             for b in books_s:
                 t = b.find("div", class_="detail__title").find("a").string
