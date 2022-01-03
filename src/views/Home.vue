@@ -4,12 +4,13 @@
   <h2>推移</h2>
   <div class="wrapper">
     <LineChart :chartData="lineData" />
+    <LineChart :chartData="lineDataSum" />
   </div>
 
   <h2>内訳</h2>
   <PieChart :chartData="pieData" />
 
-  <h2>List groupby</h2>
+  <!-- <h2>List groupby</h2>
   <table>
     <thead>
       <tr>
@@ -33,7 +34,7 @@
         </tr>
       </div>
     </tbody>
-  </table>
+  </table> -->
 
   <!-- <h2>List</h2>
   <table>
@@ -79,10 +80,9 @@ export default defineComponent({
   },
   setup() {
     const books = ref([]);
-    const groupByYearAll = ref();
-    const groupByYearHearder = ref([]);
-    const groupByYearCount = ref([]);
+    // const groupByYearAll = ref();
     const lineData = ref();
+    const lineDataSum = ref();
 
     const load = async () => {
       console.log("hogehoge");
@@ -123,19 +123,38 @@ export default defineComponent({
       }, []); //初期値は[]
 
       groupBy.sort((a: any, b: any) => a.year - b.year);
-      groupByYearHearder.value = groupBy.map((el: any) => el.year);
-      groupByYearCount.value = groupBy.map((el: any) => el.count);
 
-      groupByYearAll.value = groupBy;
+      let groupByYearHearder: string[] = [];
+      let groupByYearCount: string[] = [];
+      let groupByYearSum: number[] = [];
+      let sumCount = 0;
+      groupBy.forEach((element: any) => {
+        groupByYearHearder.push(element.year);
+        groupByYearCount.push(element.count);
 
-      console.log("fugafugaaa");
+        sumCount += parseInt(element.count);
+        groupByYearSum.push(sumCount);
+      });
 
       lineData.value = {
-        labels: groupByYearHearder.value,
+        labels: groupByYearHearder,
         datasets: [
           {
             label: "冊数",
-            data: groupByYearCount.value,
+            data: groupByYearCount,
+            fill: true,
+            borderColor: "rgb(75, 192, 192)",
+            tension: 0.1,
+          },
+        ],
+      };
+
+      lineDataSum.value = {
+        labels: groupByYearHearder,
+        datasets: [
+          {
+            label: "累計冊数",
+            data: groupByYearSum,
             fill: true,
             borderColor: "rgb(75, 192, 192)",
             tension: 0.1,
@@ -145,10 +164,6 @@ export default defineComponent({
     };
 
     load();
-    // groupByYear();
-    console.log("setup");
-    console.log(groupByYearHearder.value);
-    console.log(groupByYearCount.value);
 
     const pieData: ChartData<"pie"> = {
       labels: ["Red", "Blue", "Yellow"],
@@ -165,14 +180,14 @@ export default defineComponent({
         },
       ],
     };
-    return { pieData, lineData, books, groupByYearAll };
+    return { pieData, lineData, lineDataSum, books };
   },
 });
 </script>
 
 <style scoped>
 .wrapper {
-  /* display: flex; */
+  display: flex;
   /* width: 300px; */
 }
 </style>
