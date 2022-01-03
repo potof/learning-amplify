@@ -11,6 +11,8 @@ import {
 
 import router from "./router";
 
+import "bootstrap/dist/css/bootstrap.min.css";
+
 Amplify.configure(aws_exports);
 applyPolyfills().then(() => {
   defineCustomElements(window);
