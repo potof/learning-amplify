@@ -1,92 +1,72 @@
 <template>
   <h1>いままで読んだ本</h1>
 
-  <h2>推移</h2>
-  <div class="wrapper">
-    <LineChart :chartData="lineData" />
-    <LineChart :chartData="lineDataSum" />
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <p class="h2">{{ days }} <small class="text-muted">days</small></p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <p class="h2">{{ bookCount }} <small class="text-muted">冊</small></p>
+      </div>
+      <div class="col">
+        <p class="h2">
+          {{ pageCount }} <small class="text-muted">ページ</small>
+        </p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col">
+        <p class="h2">
+          {{ bookCountYear }} <small class="text-muted">冊／年</small>
+        </p>
+      </div>
+      <div class="col">
+        <p class="h2">
+          {{ pageCountYear }} <small class="text-muted">ページ／年</small>
+        </p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <LineChart :chartData="lineDataSum" />
+      </div>
+      <div class="col">
+        <LineChart :chartData="lineData" />
+      </div>
+    </div>
   </div>
-
-  <h2>内訳</h2>
-  <PieChart :chartData="pieData" />
-
-  <!-- <h2>List groupby</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>author</th>
-        <th>page</th>
-        <th>count</th>
-      </tr>
-    </thead>
-    <tbody>
-      <div v-for="item in groupByYearAll" :key="item.id">
-        <tr>
-          <td>
-            {{ item.year }}
-          </td>
-          <td>
-            {{ item.page }}
-          </td>
-          <td>
-            {{ item.count }}
-          </td>
-        </tr>
-      </div>
-    </tbody>
-  </table> -->
-
-  <!-- <h2>List</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Title</th>
-        <th>date</th>
-        <th>page</th>
-      </tr>
-    </thead>
-    <tbody>
-      <div v-for="item in books" :key="item.id">
-        <tr>
-          <td>
-            {{ item.title }}
-          </td>
-          <td>
-            {{ item.readDate }}
-          </td>
-          <td>
-            {{ item.page }}
-          </td>
-        </tr>
-      </div>
-    </tbody>
-  </table> -->
 </template>
 
 <script lang="ts">
 import { API } from "aws-amplify";
 import { listBooks } from "../graphql/queries";
 
-import { Chart, ChartData, registerables } from "chart.js";
+import { Chart, registerables } from "chart.js";
 import { defineComponent, ref } from "vue";
-import { PieChart, LineChart } from "vue-chart-3";
+import { LineChart } from "vue-chart-3";
 Chart.register(...registerables);
 
 export default defineComponent({
   name: "Test",
   components: {
-    PieChart,
     LineChart,
   },
   setup() {
-    const books = ref([]);
-    // const groupByYearAll = ref();
+    const books = ref();
     const lineData = ref();
     const lineDataSum = ref();
 
-    const load = async () => {
-      console.log("hogehoge");
+    const days = ref();
+    const bookCount = ref();
+    const bookCountYear = ref();
+    const pageCount = ref();
+    const pageCountYear = ref();
 
+    const load = async () => {
       // AppSync 経由でデータ取得
       const booksapi = await API.graphql({
         query: listBooks,
@@ -99,10 +79,8 @@ export default defineComponent({
       ((booksapi: any) => {
         books.value = booksapi.data.listBooks.items;
       })(booksapi);
-      // };
-
+      books.value.sort((a: any, b: any) => (a.readDate < b.readDate ? -1 : 1));
       // 日付の折れ線グラフを表示するために、年で集計する
-      // const groupByYear = () => {
       const groupBy = books.value.reduce((result: any, current: any) => {
         const element = result.find(
           (value: any) => value.year === current.readDate.slice(0, 4)
@@ -136,11 +114,12 @@ export default defineComponent({
         groupByYearSum.push(sumCount);
       });
 
+      // 年ごとの冊数グラフ
       lineData.value = {
         labels: groupByYearHearder,
         datasets: [
           {
-            label: "冊数",
+            label: "年ごと",
             data: groupByYearCount,
             fill: true,
             borderColor: "rgb(75, 192, 192)",
@@ -149,11 +128,12 @@ export default defineComponent({
         ],
       };
 
+      // 累計の冊数グラフ
       lineDataSum.value = {
         labels: groupByYearHearder,
         datasets: [
           {
-            label: "累計冊数",
+            label: "累積",
             data: groupByYearSum,
             fill: true,
             borderColor: "rgb(75, 192, 192)",
@@ -161,33 +141,42 @@ export default defineComponent({
           },
         ],
       };
+
+      let yearNum = groupBy.length;
+      days.value = (function () {
+        let from: number = new Date(books.value[0].readDate).getTime();
+        let to: number = new Date(
+          books.value[books.value.length - 1].readDate
+        ).getTime();
+        return (to - from) / 86400000;
+      })();
+      bookCount.value = books.value.length;
+      bookCountYear.value = books.value.length / yearNum;
+      pageCount.value = books.value.reduce(
+        (sum: number, element: any) => sum + element.page,
+        0
+      );
+      pageCountYear.value = pageCount.value / yearNum;
     };
 
     load();
 
-    const pieData: ChartData<"pie"> = {
-      labels: ["Red", "Blue", "Yellow"],
-      datasets: [
-        {
-          label: "My First Dataset",
-          data: [300, 50, 100],
-          backgroundColor: [
-            "rgb(255, 99, 132)",
-            "rgb(54, 162, 235)",
-            "rgb(255, 205, 86)",
-          ],
-          hoverOffset: 4,
-        },
-      ],
+    return {
+      lineData,
+      lineDataSum,
+      books,
+      days,
+      bookCount,
+      bookCountYear,
+      pageCount,
+      pageCountYear,
     };
-    return { pieData, lineData, lineDataSum, books };
   },
 });
 </script>
 
 <style scoped>
-.wrapper {
-  display: flex;
-  /* width: 300px; */
+small {
+  font-size: 18px;
 }
 </style>
